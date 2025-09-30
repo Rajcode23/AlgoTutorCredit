@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TutorAlgoCredit - Scholarship Check</title>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigoCustom: '#4f46e5',
+          },
+          animation: {
+            'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Animasi Fade In -->
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+
+    /* Pastikan modal benar-benar di atas semua elemen */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      max-width: 90%;
+      width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      z-index: 10000;
+      animation: fadeIn 0.3s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+  <!-- Sidebar -->
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col">
+      <div class="px-4 py-6 border-b border-gray-200">
+        <div class="flex items-center gap-2">
+          <img src="https://learn.algonova.id/uploads/2025/03/Logo_0_1742462072.svg?t=1742462072" alt="Logo Algonova" class="h-8" />
+          <div class="leading-tight">
+            <div class="text-sm font-semibold tracking-tight">Mi Raj</div>
+            <div class="text-xs text-gray-500">Special Tutor Algonova</div>
+          </div>
+        </div>
+      </div>
+      <nav class="p-4 space-y-1">
+        <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 font-medium transition">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11l9-8 9 8v9a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          Dashboard
+        </a>
+        <a href="checkscho.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-indigo-50 text-indigo-700 font-semibold transition">
+          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Scholarship Check
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+      <div class="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <h1 class="text-xl font-bold text-gray-900">Scholarship Status Checker</h1>
+        <span class="text-xs text-gray-500">Masukkan kode kelas & password</span>
+      </div>
+
+      <div class="px-4 py-6 max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div class="mb-6 text-center">
+            <h2 class="text-lg font-semibold text-gray-800">Cek Status Beasiswa Anda</h2>
+            <p class="text-sm text-gray-500 mt-1">Kode kelas bisa apa saja. Hasil ditentukan oleh password.</p>
+          </div>
+
+          <!-- Floating Label Input -->
+          <div class="relative mb-5">
+            <input
+              id="classCode"
+              type="text"
+              class="w-full px-4 pt-6 pb-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              placeholder=" "
+            />
+            <label for="classCode" class="absolute left-4 top-2 text-xs text-gray-500 transition-all pointer-events-none">
+              Kode Kelas (bebas)
+            </label>
+          </div>
+
+          <button
+            id="btnCheckScho"
+            class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+          >
+            Cek Status Sekarang
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Loading Modal -->
+  <div id="loadingModal" class="hidden modal-overlay">
+    <div class="modal-content">
+      <div class="flex justify-center mb-4">
+        <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      <h3 class="text-sm font-semibold text-gray-800">Memverifikasi...</h3>
+      <p class="text-xs text-gray-500 mt-1">Mohon tunggu sebentar</p>
+    </div>
+  </div>
+
+  <!-- Password Modal -->
+  <div id="passwordModal" class="hidden modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-sm font-semibold text-gray-800 mb-1">Masukkan Password</h3>
+      <p class="text-xs text-gray-500 mb-3">Password menentukan status beasiswa Anda</p>
+      <input
+        id="passwordInput"
+        type="password"
+        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        placeholder="Password"
+      />
+      <div id="passwordError" class="text-xs text-red-500 mt-1 min-h-[18px]"></div>
+      <div class="flex gap-2 mt-4">
+        <button id="passwordCancel" class="flex-1 py-2 px-4 text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition">
+          Batal
+        </button>
+        <button id="passwordSubmit" class="flex-1 bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+          Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Modal -->
+  <div id="resultModal" class="hidden modal-overlay">
+    <div class="modal-content">
+      <div id="resultIcon" class="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full bg-green-100 text-green-600">
+        <!-- Icon akan diganti oleh JS -->
+      </div>
+      <h3 class="text-sm font-semibold text-gray-800 mb-1">Status Beasiswa</h3>
+      <p id="resultText" class="text-sm text-gray-700 mb-4"></p>
+      <button id="resultClose" class="w-full bg-indigo-600 text-white font-medium py-2.5 rounded-lg hover:bg-indigo-700 transition">
+        Tutup
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const classCodeInput = document.getElementById('classCode');
+      const btnCheck = document.getElementById('btnCheckScho');
+      const passwordInput = document.getElementById('passwordInput');
+      const passwordError = document.getElementById('passwordError');
+      const resultText = document.getElementById('resultText');
+      const resultIcon = document.getElementById('resultIcon');
+
+      // Fungsi untuk tampilkan modal
+      function showModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+      }
+
+      // Fungsi untuk sembunyikan modal
+      function hideModal(id) {
+        document.getElementById(id).classList.add('hidden');
+      }
+
+      // Event: Klik tombol cek
+      btnCheck.addEventListener('click', () => {
+        const code = classCodeInput.value.trim();
+        if (!code) {
+          alert('Silakan isi kode kelas terlebih dahulu.');
+          return;
+        }
+        passwordInput.value = '';
+        passwordError.textContent = '';
+        showModal('passwordModal');
+      });
+
+      // Event: Submit password
+      document.getElementById('passwordSubmit').addEventListener('click', () => {
+        const pw = passwordInput.value.trim();
+        if (!pw) {
+          passwordError.textContent = 'Password tidak boleh kosong.';
+          return;
+        }
+
+        hideModal('passwordModal');
+        showModal('loadingModal');
+
+        // Simulasi loading 1.2 detik
+        setTimeout(() => {
+          hideModal('loadingModal');
+
+          let message = '';
+          let iconHtml = '';
+          let bgColor = '';
+
+          if (pw === 'Mirajisramiraj') {
+            message = 'Beasiswa berhasil di-claim!';
+            iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>`;
+            bgColor = 'bg-green-100 text-green-600';
+          } else if (pw === 'Mirajaja') {
+            message = 'Beasiswa sedang diproses / sedang ditinjau kembali.';
+            iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>`;
+            bgColor = 'bg-yellow-100 text-yellow-600';
+          } else if (pw === 'Miraj') {
+            message = 'Beasiswa belum dapat diterima. Silakan hubungi pihak akademik untuk informasi lebih lanjut.';
+            iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>`;
+            bgColor = 'bg-red-100 text-red-600';
+          } else {
+            message = 'Password tidak dikenali. Silakan coba lagi.';
+            iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>`;
+            bgColor = 'bg-orange-100 text-orange-600';
+          }
+
+          resultIcon.innerHTML = iconHtml;
+          resultIcon.className = `w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full ${bgColor}`;
+          resultText.textContent = message;
+          showModal('resultModal');
+        }, 1200);
+      });
+
+      // Event: Cancel password
+      document.getElementById('passwordCancel').addEventListener('click', () => hideModal('passwordModal'));
+
+      // Event: Close result
+      document.getElementById('resultClose').addEventListener('click', () => hideModal('resultModal'));
+    });
+  </script>
+</body>
+</html>
